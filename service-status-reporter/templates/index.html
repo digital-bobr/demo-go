@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Status Reporter</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <script src="/static/js/index.js"></script>
+</head>
+<body class="container">
+
+<nav class="navbar sticky-top bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Service Status Reporter</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Service Status Reporter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Services
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewService()">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Contacts
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/contact/all">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewContact()">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Teams
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/team/all">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewTeam()">Add New</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<table class="table table-hover">
+    <thead class="thead-dark">
+    <tr>
+        <th>SERVICE</th>
+        <th>TEAM</th>
+        <th>STE</th>
+        <th>DEV</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .services}}
+    <tr onclick="toggleNested('{{.ID}}')">
+        <td>{{.Name}}</td>
+        <td>{{.Team.Name}}</td>
+        <td><a href="javascript:void(0);"
+               onclick="showContactDetails('{{.SteOwner.ID}}', 'Ste Owner', '{{.SteOwner.Name}}', '{{.SteOwner.Email}}', '{{.SteOwner.Slack}}')">{{.SteOwner.Name}}</a>
+        </td>
+        <td><a href="javascript:void(0);"
+               onclick="showContactDetails('{{.Developer.ID}}', 'Developer', '{{.Developer.Name}}', '{{.Developer.Email}}', '{{.Developer.Slack}}')">{{.Developer.Name}}</a>
+        </td>
+    </tr>
+    <tr id="nested-{{.ID}}" class="nested">
+        <td colspan="4">
+            <strong>Environments:</strong>
+            <ul>
+                <li>PROD: '{{.ProdEnv}}' <span id="status-prod-nested-{{.ID}}" class="status"></span></li>
+                <li>PREPROD: '{{.PreprodEnv}}' <span id="status-preprod-nested-{{.ID}}" class="status"></span></li>
+                <li>NONPROD: '{{.NonprodEnv}}' <span id="status-nonprod-nested-{{.ID}}" class="status"></span></li>
+            </ul>
+            <button onclick="editService('{{.ID}}')" class="btn btn-warning">Edit</button>
+            <button onclick="deleteService('{{.ID}}')" class="btn btn-danger">Delete</button>
+        </td>
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">×</span>
+        <h2 id="contactRole"></h2>
+        <p id="contactDetails"></p>
+    </div>
+</div>
+<script src="/static/js/bootstrap.bundle.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+</head>
+<body>
+
+<nav class="navbar sticky-top bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Service Status Reporter</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Service Status Reporter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Services
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewService()">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Contacts
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/contact/all">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="createNewContact()">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Teams
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/team/all">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="createNewTeam()">Add New</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 class="my-4">{{ .title }}</h1>
+    {{ if .error }}
+    <div class="alert alert-danger">{{ .error }}</div>
+    {{ else }}
+    <form id="serviceForm" action="{{ .endpoint }}" method="post">
+        <input type="hidden" id="id" name="id" value="{{ .service.ID }}">
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ .service.Name }}">
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-auto">
+                <label for="ste_dropdown_id" class="form-label">Ste Owner:</label>
+                <select class="form-select" id="ste_dropdown_id" name="ste_owner_id">
+                    {{ range .steOwners }}
+                    <option value="{{ .ID }}">{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-auto">
+                <label for="developer_dropdown_id" class="form-label">Developer:</label>
+                <select class="form-select" id="developer_dropdown_id" name="developer_id">
+                    {{ range .developers }}
+                    <option value="{{ .ID }}">{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-auto">
+                <label for="team_dropdown_id" class="form-label">Team:</label>
+                <select class="form-select" id="team_dropdown_id" name="team_id">
+                    {{ range .teams }}
+                    <option value="{{ .ID }}">{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+            <div class="col-auto d-flex align-items-end">
+                <button type="button" class="btn btn-outline-secondary" onclick="addNewTeam()">+</button>
+            </div>
+
+        </div>
+
+        <div class="mb-3">
+            <label for="prod_env" class="form-label">Prod Env:</label>
+            <input type="text" class="form-control" id="prod_env" name="prod_env" value="{{ .service.ProdEnv }}"
+                   placeholder="e.g.: https://service-concierge.plutopreprod.tv">
+        </div>
+
+        <div class="mb-3">
+            <label for="preprod_env" class="form-label">Preprod Env:</label>
+            <input type="text" class="form-control" id="preprod_env" name="preprod_env"
+                   value="{{ .service.PreprodEnv }}" placeholder="e.g.: https://service-concierge.plutopreprod.tv">
+        </div>
+
+        <div class="mb-3">
+            <label for="nonprod_env" class="form-label">Nonprod Env:</label>
+            <input type="text" class="form-control" id="nonprod_env" name="nonprod_env"
+                   value="{{ .service.NonprodEnv }}" placeholder="e.g.: https://service-concierge.plutopreprod.tv">
+        </div>
+
+        <button type="submit" class="btn btn-success">{{ .buttonText }}</button>
+        <button type="button" class="btn btn-danger" onclick="window.history.back()">Cancel</button>
+    </form>
+    {{ end }}
+</div>
+<script src="/static/js/bootstrap.bundle.js"></script>
+<script src="/static/js/service.js"></script>
+<script>
+    function preselectAll() {
+        var selectOwner = document.getElementById('ste_dropdown_id');
+        if (selectOwner) {
+            console.log("Setting SteOwner:", "{{.service.SteOwnerID}}");
+            selectOwner.value = "{{.service.SteOwnerID}}";
+        }
+        var selectDeveloper = document.getElementById('developer_dropdown_id');
+        if (selectDeveloper) {
+            console.log("Setting Developer:", "{{.service.DeveloperID}}");
+            selectDeveloper.value = "{{.service.DeveloperID}}";
+        }
+        var selectTeam = document.getElementById('team_dropdown_id');
+        if (selectTeam) {
+            console.log("Setting Team:", "{{.service.TeamID}}");
+            selectTeam.value = "{{.service.TeamID}}";
+        }
+    }
+
+    window.onload = preselectAll;
+</script>
+</body>
+</html>

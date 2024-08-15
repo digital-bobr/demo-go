@@ -1,0 +1,51 @@
+CREATE TABLE IF NOT EXISTS roles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS contacts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    slack TEXT NOT NULL,
+    role_id INTEGER,
+    FOREIGN KEY (role_id) REFERENCES roles (id)
+);
+
+CREATE TABLE IF NOT EXISTS teams (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    ste_owner_id INTEGER,
+    developer_id INTEGER,
+    team_id INTEGER,
+    prod_env TEXT NOT NULL,
+    preprod_env TEXT NOT NULL,
+    nonprod_env TEXT NOT NULL,
+    FOREIGN KEY (ste_owner_id) REFERENCES contacts (id),
+    FOREIGN KEY (developer_id) REFERENCES contacts (id),
+    FOREIGN KEY (team_id) REFERENCES teams (id)
+);
+
+INSERT INTO roles (name) VALUES ('ste');
+INSERT INTO roles (name) VALUES ('developer');
+
+INSERT INTO contacts (name, email, slack, role_id) VALUES ('Igal M.', 'igal.milchakov@pluto.tv', '@Igal Milch', 1);
+INSERT INTO contacts (name, email, slack, role_id) VALUES ('Scott D.', 'scott.davis@pluto.tv', '@Scott Davis', 2);
+INSERT INTO contacts (name, email, slack, role_id) VALUES ('Edgardo C.', 'edgardo.crovetto@pluto.tv', '@Ed Crovetto', 1);
+INSERT INTO contacts (name, email, slack, role_id) VALUES ('Daniel G.', 'daniel.grehs@pluto.tv', '@Daniel Grehs', 2);
+
+INSERT INTO teams (name) VALUES ('Content Services: Prime');
+INSERT INTO teams (name) VALUES ('Content Services: Surprise');
+INSERT INTO teams (name) VALUES ('Users: One');
+INSERT INTO teams (name) VALUES ('Users: Kerberos');
+
+INSERT INTO services (name, ste_owner_id, developer_id, team_id, prod_env, preprod_env, nonprod_env)
+VALUES ('concierge', 1, 2, 1, 'https://service-concierge.clusters.pluto.tv', 'https://service-concierge.plutopreprod.tv', 'https://service-concierge-use1-1.nonprd.pluto.tv');
+
+INSERT INTO services (name, ste_owner_id, developer_id, team_id, prod_env, preprod_env, nonprod_env)
+VALUES ('bootstrap v4', 3, 4, 3, 'https://service-bootstrap-use1-1.prd.pluto.tv', 'https://service-bootstrap-use1-1.preprd.pluto.tv', 'https://service-bootstrap-use1-1.nonprd.pluto.tv');

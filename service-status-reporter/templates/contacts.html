@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Status Reporter - Contacts</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+</head>
+<body class="container">
+<nav class="navbar sticky-top bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Service Status Reporter</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Service Status Reporter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Services
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewService()">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Contacts
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/contact/all">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewContact()">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Teams
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/team/all">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewTeam()">Add New</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+<table class="table">
+    <thead class="thead-dark">
+    <tr>
+        <th>NAME</th>
+        <th>EMAIL</th>
+        <th>SLACK</th>
+        <th>ROLE</th>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .contacts}}
+    <tr>
+        <td>{{ .Name }}</td>
+        <td>{{ .Email }}</td>
+        <td>{{ .Slack }}</td>
+        <td>{{ .Role.Name }}</td>
+        <td>
+            <button onclick="editContact('{{.ID}}')" class="btn btn-warning">Edit</button>
+        </td>
+        <td>
+            <button onclick="deleteContact('{{.ID}}')" class="btn btn-danger">Delete</button>
+        </td>
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+<script src="/static/js/bootstrap.bundle.js"></script>
+<script>
+    function editContact(id) {
+        console.log(`Redirect to edit contact with ID ${id}`);
+        window.location.href = `/contact/edit?id=${id}`;
+    }
+
+    function addNewService() {
+        console.log(`Redirect to add new service page`);
+        window.location.href = `/service/add`;
+    }
+
+    function addNewContact() {
+        console.log(`Redirect to add new contact page`);
+        window.location.href = `/contact/add`;
+    }
+
+    function addNewTeam() {
+        console.log(`Redirect to add new team page`);
+        window.location.href = `/team/add`;
+    }
+
+    function deleteContact(id) {
+        if (confirm(`Are you sure you want to delete contact with ID ${id}?`)) {
+            console.log(`Delete contact with ID: ${id}`);
+            fetch(`/contact/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        return response.json().then(data => {
+                            var errorMessage = data.error + "\n" + data.details;
+                            throw new Error(errorMessage || 'Unknown error occurred');
+                        });
+                    }
+                })
+                .catch(error => {
+                    alert(`Error: ${error.message}`)
+                    console.error('Error:', error);
+                });
+        } else {
+            // Do nothing if user cancels
+            console.log('Deletion canceled.');
+        }
+    }
+
+</script>
+</body>
+</html>

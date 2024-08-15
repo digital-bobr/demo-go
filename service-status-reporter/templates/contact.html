@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+</head>
+<body>
+<nav class="navbar sticky-top bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Service Status Reporter</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Service Status Reporter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Services
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewService()">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Contacts
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/contact/all">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewContact()">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Teams
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/team/all">See Full List</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="addNewTeam()">Add New</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 class="my-4">{{ .title }}</h1>
+    {{ if .error }}
+    <div class="alert alert-danger">{{ .error }}</div>
+    {{ else }}
+    <form id="contactForm" action="{{ .endpoint }}" method="post">
+        <input type="hidden" id="id" name="id" value="{{ .contact.ID }}">
+        <input type="hidden" id="is_form" name="is_form" value="true">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ .contact.Name }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="text" class="form-control" id="email" name="email" value="{{ .contact.Email }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="slack" class="form-label">Slack:</label>
+            <input type="text" class="form-control" id="slack" name="slack" value="{{ .contact.Slack }}">
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-auto">
+                <label for="role_dropdown_id" class="form-label">Role:</label>
+                <select class="form-select" id="role_dropdown_id" name="role_id">
+                    {{ range .roles }}
+                    <option value="{{ .ID }}">{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">{{ .buttonText }}</button>
+        <button type="button" class="btn btn-danger" onclick="window.history.back()">Cancel</button>
+    </form>
+    {{ end }}
+</div>
+<script src="/static/js/bootstrap.bundle.js"></script>
+<script>
+    function addNewService() {
+        console.log(`Redirect to add new service page`);
+        window.location.href = `/service/add`;
+    }
+
+    function addNewContact() {
+        console.log(`Redirect to add new contact page`);
+        window.location.href = `/contact/add`;
+    }
+
+    function addNewTeam() {
+        console.log(`Redirect to add new team page`);
+        window.location.href = `/team/add`;
+    }
+
+    function preselectRole() {
+        var selectRole = document.getElementById('role_dropdown_id');
+        if (selectRole) {
+            selectRole.value = "{{.contact.RoleID}}";
+        }
+    }
+
+    window.onload = preselectRole;
+</script>
+</body>
+</html>
